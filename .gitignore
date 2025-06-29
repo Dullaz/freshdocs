@@ -1,6 +1,9 @@
 # FreshDocs executable
 freshdocs
 
+# Build artifacts
+dist/
+
 # Go build artifacts
 *.exe
 *.exe~
