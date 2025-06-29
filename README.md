@@ -26,6 +26,7 @@ FreshDocs can also be used by developers to quickly find what documentation will
 ## 🛠️ Installation
 
 ```bash
+brew tap dullaz/freshdocs
 brew install freshdocs
 ```
 
