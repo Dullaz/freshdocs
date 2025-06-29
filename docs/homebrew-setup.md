@@ -26,7 +26,7 @@ Users can then install your tool with:
 
 ```bash
 # Add your repository as a tap
-brew tap yourusername/freshdoc
+brew tap dullaz/freshdocs
 
 # Install freshdocs
 brew install freshdocs
@@ -36,7 +36,7 @@ Or if you prefer a different tap name:
 
 ```bash
 # Add your repository as a tap with a custom name
-brew tap yourusername/freshdoc https://github.com/yourusername/freshdoc
+brew tap dullaz/freshdocs https://github.com/dullaz/freshdocs
 
 # Install freshdocs
 brew install freshdocs
@@ -57,25 +57,25 @@ The workflow will create a formula like this:
 ```ruby
 class Freshdocs < Formula
   desc "Keep your documentation as fresh as your code"
-  homepage "https://github.com/yourusername/freshdoc"
+  homepage "https://github.com/dullaz/freshdocs"
   version "v1.0.0"
   
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/yourusername/freshdoc/releases/download/v1.0.0/freshdocs-v1.0.0-darwin-arm64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.0.0/freshdocs-v1.0.0-darwin-arm64.tar.gz"
       sha256 "your-sha256-here"
     else
-      url "https://github.com/yourusername/freshdoc/releases/download/v1.0.0/freshdocs-v1.0.0-darwin-amd64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.0.0/freshdocs-v1.0.0-darwin-amd64.tar.gz"
       sha256 "your-sha256-here"
     end
   end
   
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/yourusername/freshdoc/releases/download/v1.0.0/freshdocs-v1.0.0-linux-arm64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.0.0/freshdocs-v1.0.0-linux-arm64.tar.gz"
       sha256 "your-sha256-here"
     else
-      url "https://github.com/yourusername/freshdoc/releases/download/v1.0.0/freshdocs-v1.0.0-linux-amd64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.0.0/freshdocs-v1.0.0-linux-amd64.tar.gz"
       sha256 "your-sha256-here"
     end
   end

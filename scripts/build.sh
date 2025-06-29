@@ -51,25 +51,25 @@ LINUX_ARM64_SHA=$(shasum -a 256 "dist/freshdocs-$VERSION-linux-arm64.tar.gz" | c
 cat > Formula/freshdocs.rb << EOF
 class Freshdocs < Formula
   desc "Keep your documentation as fresh as your code"
-  homepage "https://github.com/dullaz/freshdoc"
+  homepage "https://github.com/dullaz/freshdocs"
   version "$VERSION"
   
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/dullaz/freshdoc/releases/download/$VERSION/freshdocs-$VERSION-darwin-arm64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/$VERSION/freshdocs-$VERSION-darwin-arm64.tar.gz"
       sha256 "$DARWIN_ARM64_SHA"
     else
-      url "https://github.com/dullaz/freshdoc/releases/download/$VERSION/freshdocs-$VERSION-darwin-amd64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/$VERSION/freshdocs-$VERSION-darwin-amd64.tar.gz"
       sha256 "$DARWIN_AMD64_SHA"
     end
   end
   
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/dullaz/freshdoc/releases/download/$VERSION/freshdocs-$VERSION-linux-arm64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/$VERSION/freshdocs-$VERSION-linux-arm64.tar.gz"
       sha256 "$LINUX_ARM64_SHA"
     else
-      url "https://github.com/dullaz/freshdoc/releases/download/$VERSION/freshdocs-$VERSION-linux-amd64.tar.gz"
+      url "https://github.com/dullaz/freshdocs/releases/download/$VERSION/freshdocs-$VERSION-linux-amd64.tar.gz"
       sha256 "$LINUX_AMD64_SHA"
     end
   end
