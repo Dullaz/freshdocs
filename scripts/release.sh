@@ -31,25 +31,13 @@ if git tag -l | grep -q "^$VERSION$"; then
     exit 1
 fi
 
-# Build binaries and create formula
-echo "Building binaries and creating Homebrew formula..."
-./scripts/build.sh "$VERSION"
-
-# Add all files
-git add .
-
-# Commit changes
-echo "Committing changes..."
-git commit -m "Release $VERSION
-
-- Build binaries for all platforms
-- Update Homebrew formula"
-
 # Create and push tag
 echo "Creating and pushing tag..."
 git tag "$VERSION"
-git push origin main
 git push origin "$VERSION"
 
 echo "Release $VERSION created successfully!"
-echo "GitHub Actions will now create the GitHub release with the binaries." 
+echo "GitHub Actions will now:"
+echo "1. Build binaries for all platforms"
+echo "2. Create a GitHub release with the binaries"
+echo "3. Update the Homebrew formula in dullaz/homebrew-freshdocs" 

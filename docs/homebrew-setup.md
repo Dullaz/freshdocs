@@ -1,42 +1,45 @@
 # Homebrew Setup Guide
 
-This document explains how to set up FreshDocs for distribution via Homebrew using the same repository.
+This document explains how to set up FreshDocs for distribution via Homebrew using a separate tap repository.
 
 ## Prerequisites
 
 1. A GitHub repository for your project (this repository)
+2. A separate GitHub repository for your Homebrew tap: `dullaz/homebrew-freshdocs`
 
 ## Setup Steps
 
-### 1. The Formula Directory
+### 1. Create the Homebrew Tap Repository
 
-The GitHub Actions workflow will automatically create a `Formula/` directory in your repository and add a `freshdocs.rb` file when you create a release.
+Create a new GitHub repository named `homebrew-freshdocs` with the following structure:
 
-### 2. Release Process
+```
+homebrew-freshdocs/
+└── Formula/
+    └── freshdocs.rb
+```
+
+### 2. Set up GitHub Secrets
+
+In your main repository (`dullaz/freshdocs`), go to Settings > Secrets and variables > Actions and add:
+
+- `HOMEBREW_TAP_TOKEN`: A GitHub Personal Access Token with repo permissions for the `dullaz/homebrew-freshdocs` repository
+
+### 3. Release Process
 
 1. **Tag a release**: `git tag v1.0.0 && git push origin v1.0.0`
 2. **GitHub Actions** will automatically:
    - Build binaries for all platforms
-   - Create a GitHub release
-   - Create/update the Homebrew formula in your repository
+   - Create a GitHub release with the binaries
+   - Update the Homebrew formula in `dullaz/homebrew-freshdocs`
 
-### 3. Install via Homebrew
+### 4. Install via Homebrew
 
 Users can then install your tool with:
 
 ```bash
-# Add your repository as a tap
+# Add your tap
 brew tap dullaz/freshdocs
-
-# Install freshdocs
-brew install freshdocs
-```
-
-Or if you prefer a different tap name:
-
-```bash
-# Add your repository as a tap with a custom name
-brew tap dullaz/freshdocs https://github.com/dullaz/freshdocs
 
 # Install freshdocs
 brew install freshdocs
@@ -48,11 +51,11 @@ If you prefer to release manually:
 
 1. Run the build script: `./scripts/build.sh v1.0.0`
 2. Create a GitHub release with the generated files
-3. Create the `Formula/freshdocs.rb` file manually with the correct URLs and SHA256 hashes
+3. Manually update the `Formula/freshdocs.rb` file in `dullaz/homebrew-freshdocs`
 
 ## Example Formula
 
-The workflow will create a formula like this:
+The workflow will create a formula like this in `dullaz/homebrew-freshdocs/Formula/freshdocs.rb`:
 
 ```ruby
 class Freshdocs < Formula
@@ -92,7 +95,7 @@ end
 
 ## Troubleshooting
 
-- **SHA256 mismatch**: Make sure the SHA256 in the formula matches the actual file
+- **SHA256 mismatch**: The workflow automatically calculates the correct hashes from the released binaries
 - **URL errors**: Verify the release URLs are correct and accessible
 - **Build failures**: Check that all dependencies are properly specified in `go.mod`
-- **Permission errors**: Ensure the workflow has write permissions to the repository 
+- **Permission errors**: Ensure the `HOMEBREW_TAP_TOKEN` has write access to `dullaz/homebrew-freshdocs` 
