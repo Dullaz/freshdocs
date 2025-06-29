@@ -23,6 +23,19 @@ var checkCmd = &cobra.Command{
 
 		// Process documents and find stale ones
 		processor := processor.NewProcessor(cfg)
+
+		// Check for missing files first
+		missing, err := processor.CheckMissingFiles()
+		if err != nil {
+			return fmt.Errorf("check failed: %w", err)
+		}
+
+		// Print missing file errors
+		for _, doc := range missing {
+			fmt.Printf("%s references %s that doesn't exist\n", doc.Path, doc.AffectedBy)
+		}
+
+		// Check for documents affected by git changes
 		stale, err := processor.Check()
 		if err != nil {
 			return fmt.Errorf("check failed: %w", err)

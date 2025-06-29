@@ -23,12 +23,25 @@ var validateCmd = &cobra.Command{
 
 		// Process documents and find affected ones
 		processor := processor.NewProcessor(cfg)
+
+		// Check for missing files first
+		missing, err := processor.CheckMissingFiles()
+		if err != nil {
+			return fmt.Errorf("validation failed: %w", err)
+		}
+
+		// Print missing file errors
+		for _, doc := range missing {
+			fmt.Printf("%s references %s that doesn't exist\n", doc.Path, doc.AffectedBy)
+		}
+
+		// Check for stale documents
 		affected, err := processor.Validate()
 		if err != nil {
 			return fmt.Errorf("validation failed: %w", err)
 		}
 
-		// Print results
+		// Print stale document results
 		for _, doc := range affected {
 			fmt.Printf("%s affected by %s\n", doc.Path, doc.AffectedBy)
 		}

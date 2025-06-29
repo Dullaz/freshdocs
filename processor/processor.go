@@ -50,10 +50,15 @@ func (p *Processor) Validate() ([]Document, error) {
 
 		for _, doc := range docs {
 			for _, ann := range doc.Annotations {
+				// Skip annotations for files that don't exist
+				if !p.fileExists(ann) {
+					continue
+				}
+
 				if p.isAnnotationStale(ann) {
 					doc.AffectedBy = ann.Path
 					affected = append(affected, doc)
-					break // Only add document once even if multiple annotations are stale
+					break // Only add document once even if multiple annotations are affected
 				}
 			}
 		}
@@ -74,7 +79,36 @@ func (p *Processor) Check() ([]Document, error) {
 
 		for _, doc := range docs {
 			for _, ann := range doc.Annotations {
+				// Skip annotations for files that don't exist
+				if !p.fileExists(ann) {
+					continue
+				}
+
 				if p.isAnnotationAffectedByGitChanges(ann) {
+					doc.AffectedBy = ann.Path
+					affected = append(affected, doc)
+					break // Only add document once even if multiple annotations are affected
+				}
+			}
+		}
+	}
+
+	return affected, nil
+}
+
+// CheckMissingFiles checks for documents that reference files that don't exist
+func (p *Processor) CheckMissingFiles() ([]Document, error) {
+	var affected []Document
+
+	for _, group := range p.config.DocumentGroups {
+		docs, err := p.processDocumentGroup(group)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, doc := range docs {
+			for _, ann := range doc.Annotations {
+				if !p.fileExists(ann) {
 					doc.AffectedBy = ann.Path
 					affected = append(affected, doc)
 					break // Only add document once even if multiple annotations are affected
@@ -95,6 +129,14 @@ func (p *Processor) Update() error {
 		}
 
 		for _, doc := range docs {
+			// Check for missing files and warn
+			for _, ann := range doc.Annotations {
+				if !p.fileExists(ann) {
+					fmt.Printf("Warning: %s references %s that doesn't exist, skipping\n", doc.Path, ann.Path)
+					continue
+				}
+			}
+
 			if err := p.updateDocumentHashes(doc); err != nil {
 				return err
 			}
@@ -286,6 +328,21 @@ func (p *Processor) isAnnotationAffectedByGitChanges(ann Annotation) bool {
 	}
 
 	return false
+}
+
+// fileExists checks if the referenced file exists
+func (p *Processor) fileExists(ann Annotation) bool {
+	repo, exists := p.config.Repositories[ann.Repository]
+	if !exists {
+		return false
+	}
+
+	// Construct full path to the file
+	fullPath := filepath.Join(repo.Path, ann.Path)
+
+	// Check if file exists
+	_, err := os.Stat(fullPath)
+	return err == nil
 }
 
 // updateDocumentHashes updates the hashes in a document file
