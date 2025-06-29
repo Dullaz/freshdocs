@@ -30,4 +30,10 @@ fresh check
 
 # Update all document hashes
 fresh update
-``` 
+```
+
+## Annotation Format
+
+FreshDocs annotations follow this format:
+- `<!--- fresh:file repo:path -->` (first time, no hash)
+- `<!--- fresh:file repo:path abc1234 -->` (with Git commit hash) 

@@ -1,9 +1,9 @@
 package processor
 
 import (
-	"crypto/sha256"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -21,7 +21,6 @@ type Document struct {
 	Path        string
 	AffectedBy  string
 	Annotations []Annotation
-	Hash        string
 }
 
 // Annotation represents a link between a document and code
@@ -29,6 +28,7 @@ type Annotation struct {
 	Repository string
 	Path       string
 	Line       int
+	Hash       string // Git commit hash of the linked file
 }
 
 // NewProcessor creates a new processor instance
@@ -49,8 +49,12 @@ func (p *Processor) Validate() ([]Document, error) {
 		}
 
 		for _, doc := range docs {
-			if p.isDocumentStale(doc) {
-				affected = append(affected, doc)
+			for _, ann := range doc.Annotations {
+				if p.isAnnotationStale(ann) {
+					doc.AffectedBy = ann.Path
+					affected = append(affected, doc)
+					break // Only add document once even if multiple annotations are stale
+				}
 			}
 		}
 	}
@@ -73,7 +77,7 @@ func (p *Processor) Update() error {
 		}
 
 		for _, doc := range docs {
-			if err := p.updateDocumentHash(doc); err != nil {
+			if err := p.updateDocumentHashes(doc); err != nil {
 				return err
 			}
 		}
@@ -88,7 +92,7 @@ func (p *Processor) UpdateFile(filePath string) error {
 	for _, group := range p.config.DocumentGroups {
 		if strings.HasPrefix(filePath, group.Path) {
 			doc := Document{Path: filePath}
-			return p.updateDocumentHash(doc)
+			return p.updateDocumentHashes(doc)
 		}
 	}
 
@@ -158,9 +162,6 @@ func (p *Processor) processDocument(path string) (Document, error) {
 	}
 	doc.Annotations = annotations
 
-	// Calculate hash
-	doc.Hash = p.calculateHash(string(content))
-
 	return doc, nil
 }
 
@@ -168,14 +169,19 @@ func (p *Processor) processDocument(path string) (Document, error) {
 func (p *Processor) parseAnnotations(content string) ([]Annotation, error) {
 	var annotations []Annotation
 
-	// Regex to match FreshDocs annotations: <!--- fresh:file repo:path -->
-	re := regexp.MustCompile(`<!---\s*fresh:file\s+(\w+):([^\s]+)\s*-->`)
+	// Regex to match FreshDocs annotations that start at the beginning of a line
+	// <!--- fresh:file repo:path [hash] -->
+	re := regexp.MustCompile(`(?m)^\s*<!---\s*fresh:file\s+(\w+):([^\s]+)(?:\s+([a-f0-9]+))?\s*-->`)
 	matches := re.FindAllStringSubmatch(content, -1)
 
 	for _, match := range matches {
 		if len(match) >= 3 {
 			repo := match[1]
 			path := match[2]
+			hash := ""
+			if len(match) >= 4 {
+				hash = match[3]
+			}
 
 			// Validate repository exists in config
 			if _, exists := p.config.Repositories[repo]; !exists {
@@ -185,6 +191,7 @@ func (p *Processor) parseAnnotations(content string) ([]Annotation, error) {
 			annotations = append(annotations, Annotation{
 				Repository: repo,
 				Path:       path,
+				Hash:       hash,
 			})
 		}
 	}
@@ -192,30 +199,81 @@ func (p *Processor) parseAnnotations(content string) ([]Annotation, error) {
 	return annotations, nil
 }
 
-// calculateHash calculates SHA256 hash of content
-func (p *Processor) calculateHash(content string) string {
-	hash := sha256.Sum256([]byte(content))
-	return fmt.Sprintf("%x", hash)
+// getGitHash gets the current Git commit hash for a file
+func (p *Processor) getGitHash(repoName, filePath string) (string, error) {
+	repo, exists := p.config.Repositories[repoName]
+	if !exists {
+		return "", fmt.Errorf("unknown repository: %s", repoName)
+	}
+
+	// Construct full path to the file
+	fullPath := filepath.Join(repo.Path, filePath)
+
+	// Get Git hash for the file
+	cmd := exec.Command("git", "rev-parse", "HEAD:"+filePath)
+	cmd.Dir = repo.Path
+
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to get Git hash for %s: %w", fullPath, err)
+	}
+
+	// Return first 7 characters (short hash)
+	hash := strings.TrimSpace(string(output))
+	if len(hash) >= 7 {
+		return hash[:7], nil
+	}
+	return hash, nil
 }
 
-// isDocumentStale checks if a document is stale by comparing hashes
-func (p *Processor) isDocumentStale(doc Document) bool {
-	// For now, we'll consider a document stale if it has annotations
-	// In a real implementation, you'd compare against stored hashes
-	return len(doc.Annotations) > 0
+// isAnnotationStale checks if an annotation is stale by comparing hashes
+func (p *Processor) isAnnotationStale(ann Annotation) bool {
+	// If no hash is set, it's considered stale (first time annotation)
+	if ann.Hash == "" {
+		return true
+	}
+
+	// Get current hash for the file
+	currentHash, err := p.getGitHash(ann.Repository, ann.Path)
+	if err != nil {
+		// If we can't get the hash, assume it's stale
+		return true
+	}
+
+	// Compare hashes
+	return ann.Hash != currentHash
 }
 
-// updateDocumentHash updates the stored hash for a document
-func (p *Processor) updateDocumentHash(doc Document) error {
-	// In a real implementation, you'd store the hash in a database or file
-	// For now, we'll just recalculate it
+// updateDocumentHashes updates the hashes in a document file
+func (p *Processor) updateDocumentHashes(doc Document) error {
+	// Read current content
 	content, err := os.ReadFile(doc.Path)
 	if err != nil {
 		return err
 	}
 
-	doc.Hash = p.calculateHash(string(content))
-	// Store the hash somewhere (database, file, etc.)
+	contentStr := string(content)
 
-	return nil
+	// Update each annotation with current hash
+	for _, ann := range doc.Annotations {
+		currentHash, err := p.getGitHash(ann.Repository, ann.Path)
+		if err != nil {
+			return err
+		}
+
+		// Create old and new annotation strings
+		oldAnnotation := fmt.Sprintf("<!--- fresh:file %s:%s %s -->", ann.Repository, ann.Path, ann.Hash)
+		newAnnotation := fmt.Sprintf("<!--- fresh:file %s:%s %s -->", ann.Repository, ann.Path, currentHash)
+
+		// If no hash was present, handle that case
+		if ann.Hash == "" {
+			oldAnnotation = fmt.Sprintf("<!--- fresh:file %s:%s -->", ann.Repository, ann.Path)
+		}
+
+		// Replace in content
+		contentStr = strings.Replace(contentStr, oldAnnotation, newAnnotation, 1)
+	}
+
+	// Write updated content back to file
+	return os.WriteFile(doc.Path, []byte(contentStr), 0644)
 }

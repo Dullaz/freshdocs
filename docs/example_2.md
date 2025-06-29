@@ -7,9 +7,6 @@ This is another example documentation file.
 <!--- fresh:file core:cmd/check.go -->
 The check command performs quick validation.
 
-<!--- fresh:file utils:processor/processor.go -->
-The processor handles the core logic.
-
 ## Advanced Usage
 
 <!--- fresh:file core:cmd/find.go -->
