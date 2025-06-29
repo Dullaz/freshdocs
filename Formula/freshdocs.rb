@@ -1,25 +1,25 @@
 class Freshdocs < Formula
   desc "Keep your documentation as fresh as your code"
-  homepage "https://github.com/dullaz/freshdoc"
-  version "v1.1.0"
+  homepage "https://github.com/dullaz/freshdocs"
+  version "v1.2.0"
   
   on_macos do
     if Hardware::CPU.arm?
-      url "https://github.com/dullaz/freshdoc/releases/download/v1.1.0/freshdocs-v1.1.0-darwin-arm64.tar.gz"
-      sha256 "2d5e4e2efcfaaeba6092bfd7cc839839379194cea18d1e31ed91ed6e2a3a7376"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.2.0/freshdocs-v1.2.0-darwin-arm64.tar.gz"
+      sha256 "bef4bfd96ea02a9f3fc7eb8946725ca7ddb6999a28da68fe89943ecdd0de805e"
     else
-      url "https://github.com/dullaz/freshdoc/releases/download/v1.1.0/freshdocs-v1.1.0-darwin-amd64.tar.gz"
-      sha256 "4d4143b1ddd8a05374f9ef4c06635d45badece3145c10e52022cc2d6a610fdae"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.2.0/freshdocs-v1.2.0-darwin-amd64.tar.gz"
+      sha256 "ee2eab6b5785080b1fcc45b2ee24cc339eead4c64082d2538de7246e6193c44c"
     end
   end
   
   on_linux do
     if Hardware::CPU.arm?
-      url "https://github.com/dullaz/freshdoc/releases/download/v1.1.0/freshdocs-v1.1.0-linux-arm64.tar.gz"
-      sha256 "1613a1b52c4e96cb4e099bece4626a06cbae42110c72a484a6a2c8d12eb3b0f9"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.2.0/freshdocs-v1.2.0-linux-arm64.tar.gz"
+      sha256 "99a9a3a2be84b95faf3ed35f89457e7d05281ed4c92bfd3a59483ee037ae9582"
     else
-      url "https://github.com/dullaz/freshdoc/releases/download/v1.1.0/freshdocs-v1.1.0-linux-amd64.tar.gz"
-      sha256 "701b482f4ea6a5411efe655771cd71bda50d5b70cc4db83829c93debdb73b0e5"
+      url "https://github.com/dullaz/freshdocs/releases/download/v1.2.0/freshdocs-v1.2.0-linux-amd64.tar.gz"
+      sha256 "b229154702f0422bdc6aa3645d76007c28c60854ce46e6a7f2a2df665046c512"
     end
   end
   
