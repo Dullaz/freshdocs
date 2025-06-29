@@ -1,0 +1,9 @@
+version: 1
+repositories:
+    core:
+        path: ../my-service
+    utils:
+        path: ../shared-utils
+documentGroups:
+    - path: ./docs/folder
+      ext: .md
