@@ -48,6 +48,9 @@ jobs:
           repository: dullaz/homebrew-freshdocs
           token: ${{ secrets.HOMEBREW_TAP_TOKEN }}
 
+      - name: Create Formula directory
+        run: mkdir -p Formula
+
       - name: Get SHA256 hashes
         run: |
           VERSION=${GITHUB_REF#refs/tags/}
