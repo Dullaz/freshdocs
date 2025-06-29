@@ -10,8 +10,8 @@ import (
 
 var checkCmd = &cobra.Command{
 	Use:   "check",
-	Short: "Check for stale documentation",
-	Long:  `Perform a quick check to identify documentation that may be stale.`,
+	Short: "Check for docs affected by uncommitted changes",
+	Long:  `Scan for documentation files that are affected by uncommitted (staged or unstaged) changes in your code. This helps you see what docs will need updating before you commit.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		configPath := "freshdocs.yaml"
 

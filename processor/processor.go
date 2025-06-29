@@ -64,8 +64,26 @@ func (p *Processor) Validate() ([]Document, error) {
 
 // Check performs a quick check for stale documentation
 func (p *Processor) Check() ([]Document, error) {
-	// Similar to Validate but with different output format
-	return p.Validate()
+	var affected []Document
+
+	for _, group := range p.config.DocumentGroups {
+		docs, err := p.processDocumentGroup(group)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, doc := range docs {
+			for _, ann := range doc.Annotations {
+				if p.isAnnotationAffectedByGitChanges(ann) {
+					doc.AffectedBy = ann.Path
+					affected = append(affected, doc)
+					break // Only add document once even if multiple annotations are affected
+				}
+			}
+		}
+	}
+
+	return affected, nil
 }
 
 // Update updates hashes for all documents
@@ -242,6 +260,32 @@ func (p *Processor) isAnnotationStale(ann Annotation) bool {
 
 	// Compare hashes
 	return ann.Hash != currentHash
+}
+
+// isAnnotationAffectedByGitChanges checks if an annotation is affected by unstaged or staged changes
+func (p *Processor) isAnnotationAffectedByGitChanges(ann Annotation) bool {
+	repo, exists := p.config.Repositories[ann.Repository]
+	if !exists {
+		return false
+	}
+
+	// Check if the file has unstaged changes
+	cmd := exec.Command("git", "diff", "--name-only", ann.Path)
+	cmd.Dir = repo.Path
+	unstagedOutput, err := cmd.Output()
+	if err == nil && len(strings.TrimSpace(string(unstagedOutput))) > 0 {
+		return true
+	}
+
+	// Check if the file has staged changes
+	cmd = exec.Command("git", "diff", "--cached", "--name-only", ann.Path)
+	cmd.Dir = repo.Path
+	stagedOutput, err := cmd.Output()
+	if err == nil && len(strings.TrimSpace(string(stagedOutput))) > 0 {
+		return true
+	}
+
+	return false
 }
 
 // updateDocumentHashes updates the hashes in a document file

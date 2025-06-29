@@ -5,7 +5,7 @@
 
 **Keep your documentation as fresh as your code!**
 
-FreshDocs is an app that helps developers and users maintain a real, actionable connection between documentation and source code. 
+FreshDocs helps developers and teams maintain a real, actionable connection between documentation and source code. 
 By embedding hidden comment annotations in doc files, you can link docs to specific code files or folders. 
 Whenever the code changes, FreshDocs detects which documentation is now stale — so your docs never fall behind.
 
@@ -16,14 +16,14 @@ FreshDocs can also be used by developers to quickly find what documentation will
 ## 🚀 Features
 
 - **Code-to-Doc Linkage:** Use simple annotations to connect markdown files to code.
-- **Stale Doc Detection:** Automatically flags documentation that’s out of date when code changes.
+- **Stale Doc Detection:** Flags documentation that's out of date with committed code.
+- **Uncommitted Change Detection:** Instantly see which docs are affected by your current (uncommitted) changes.
 - **Flexible Linking:** Supports linking single files or entire directories.
 - **Developer Friendly:** Integrates smoothly into existing workflows.
 
 ---
 
 ## 🛠️ Installation
-
 
 ```bash
 brew install freshdocs
@@ -33,68 +33,85 @@ brew install freshdocs
 
 ## 📖 How It Works
 
-1. **Initialise freshdocs**  
-   Navigate to where you want to store the fresh config and run
+1. **Initialize freshdocs**  
+   Navigate to where you want to store the config and run:
    ```bash
    fresh init
    ```
 2. **Update the configuration**  
-   The app will provide placeholder values that you can modify
-   
-   More than one target repository can be specified, and more than one
-   document folder can be configured too.
+   The app will provide placeholder values that you can modify. More than one target repository and document folder can be configured.
 
    ```yaml
    version: 1
    repositories:
-      core:
-        path: ../my-service
-      utils:
-        path: ../shared-utils
+     core:
+       path: ../my-service
+     utils:
+       path: ../shared-utils
    documentGroups:
-   - path: ./docs/folder
-     ext: .md
-
+     - path: ./docs/folder
+       ext: .md
    ```
 3. **Add annotations to your documents**  
-   
+   Place annotations at the start of a line in your markdown files:
    ```md
-   # the following is an annotation
-   
    <!--- fresh:file core:folder/to/file.go -->
    ```
-   
-   For a full list of supported annotations, see here
+   The first time you add an annotation, it will not have a hash. After running `fresh update`, a short git commit hash will be added:
+   ```md
+   <!--- fresh:file core:folder/to/file.go abc1234 -->
+   ```
+   Only annotations at the start of a line are recognized (not those used as examples in docs).
+
 ---
 
-## Command examples
+## 🧩 Annotation Format
+
+- `<!--- fresh:file repo:path/to/file.go -->` (first time, no hash)
+- `<!--- fresh:file repo:path/to/file.go abc1234 -->` (with git commit hash, after update)
+
+---
+
+## 🕹️ Commands
+
+- `fresh check`  
+  Lists all documentation files affected by **uncommitted changes** (staged or unstaged) in your code. Use this before you commit to see what docs will need updating for your current work.
+
+- `fresh validate`  
+  Lists all documentation files that are **stale** (out of date with the latest committed code). Use this after you commit to see what docs need updating.
+
+- `fresh update`  
+  Updates the hashes in your documentation to match the current git commit for each linked file.
+
+- `fresh update <file.md>`  
+  Updates hashes for a specific documentation file.
+
+- `fresh find <path/to/code.go>`  
+  Lists all documentation files that reference the given code file.
+
+---
+
+## 📝 Command Examples
 
 ```shell
 fresh validate
-docs/example.md:2 affected by cmd/update.go
-docs/example_2.md:2 affected by cmd/check.go
-```
+# docs/example.md affected by cmd/update.go
+# docs/example_2.md affected by cmd/check.go
 
-```shell
 fresh check
-docs/example_3.md:2 affected by cmd/validate.go
-```
+# docs/example_3.md affected by cmd/validate.go
 
-```shell
 fresh update
-```
-(hashes are now updated)
+# (hashes are now updated)
 
-```shell
-fresh update specific/file/path.md
-```
-(hashes for that path are updated)
+fresh update docs/example.md
+# (hashes for that file are updated)
 
-```shell
-fresh find path/to/some/code.go
-some/docs/path.md
-another/docs/path.md
+fresh find cmd/update.go
+# docs/example.md
 ```
+
+---
 
 ## 📂 Repository Structure
 

@@ -10,8 +10,8 @@ import (
 
 var validateCmd = &cobra.Command{
 	Use:   "validate",
-	Short: "Validate which documents are affected by code changes",
-	Long:  `Check which documentation files are affected by changes in the linked code files.`,
+	Short: "Show which docs are stale (out of date with committed code)",
+	Long:  `Check which documentation files are stale, meaning their linked code has changed in committed history since the last update. Use this to find docs that need updating after code changes have been committed.`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		configPath := "freshdocs.yaml"
 
