@@ -44,6 +44,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
 
       - name: Create Formula directory
         run: mkdir -p Formula
@@ -102,4 +104,4 @@ jobs:
           git config user.email "actions@github.com"
           git add Formula/freshdocs.rb
           git commit -m "Update Homebrew formula to ${{ github.ref_name }}"
-          git push 
+          git push origin main 
