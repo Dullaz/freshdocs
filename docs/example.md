@@ -9,7 +9,7 @@ The following section documents the main API functions:
 <!--- fresh:file core:cmd/update.go 345f884 -->
 The `update` command allows you to update document hashes.
 
-<!--- fresh:file core:cmd/validate.go 1bc4df0 -->
+<!--- fresh:file core:cmd/validate.go 6149054 -->
 The `validate` command checks which documents are affected by code changes.
 
 ## Configuration
