@@ -4,7 +4,7 @@ This is another example documentation file.
 
 ## Core Functions
 
-<!--- fresh:file core:cmd/some.go c5eb2de -->
+<!--- fresh:file core:cmd/check.go 6a4d565 -->
 The check command performs quick validation.
 
 ## Advanced Usage
