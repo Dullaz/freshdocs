@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/bmatcuk/doublestar/v4"
 	"github.com/dullaz/freshdocs/config"
 )
 
@@ -67,7 +68,7 @@ func (p *Processor) Validate() ([]Document, error) {
 	return affected, nil
 }
 
-// Check performs a quick check for stale documentation
+// Finds annotations that are affected by uncommitted changes.
 func (p *Processor) Check() ([]Document, error) {
 	var affected []Document
 
@@ -171,7 +172,7 @@ func (p *Processor) Find(codeFile string) ([]string, error) {
 
 		for _, doc := range docs {
 			for _, ann := range doc.Annotations {
-				if ann.Path == codeFile {
+				if found, err := doublestar.PathMatch(ann.Path, codeFile); err == nil && found {
 					linkedDocs = append(linkedDocs, doc.Path)
 					break
 				}
@@ -270,7 +271,8 @@ func (p *Processor) getGitHash(repoName, filePath string) (string, error) {
 	fullPath := filepath.Join(repo.Path, filePath)
 
 	// Get Git hash for the file
-	cmd := exec.Command("git", "rev-parse", "HEAD:"+filePath)
+	// cmd := exec.Command("git", "rev-parse", "HEAD:"+filePath)
+	cmd := exec.Command("git", "log", "-n", "1", "--pretty=format:%h", "--", filePath)
 	cmd.Dir = repo.Path
 
 	output, err := cmd.Output()
@@ -306,6 +308,7 @@ func (p *Processor) isAnnotationStale(ann Annotation) bool {
 
 // isAnnotationAffectedByGitChanges checks if an annotation is affected by unstaged or staged changes
 func (p *Processor) isAnnotationAffectedByGitChanges(ann Annotation) bool {
+
 	repo, exists := p.config.Repositories[ann.Repository]
 	if !exists {
 		return false
@@ -337,12 +340,12 @@ func (p *Processor) fileExists(ann Annotation) bool {
 		return false
 	}
 
-	// Construct full path to the file
-	fullPath := filepath.Join(repo.Path, ann.Path)
+	matches, err := doublestar.Glob(os.DirFS(repo.Path), ann.Path, doublestar.WithFilesOnly())
+	if err != nil {
+		return false
+	}
 
-	// Check if file exists
-	_, err := os.Stat(fullPath)
-	return err == nil
+	return len(matches) > 0
 }
 
 // updateDocumentHashes updates the hashes in a document file

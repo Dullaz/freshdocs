@@ -4,6 +4,7 @@ This is an example documentation file that demonstrates how to use FreshDocs ann
 
 ## API Reference
 
+<!--- fresh:file core:cmd/*.go -->
 The following section documents the main API functions:
 
 <!--- fresh:file core:cmd/update.go 345f884 -->
