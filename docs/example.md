@@ -4,18 +4,18 @@ This is an example documentation file that demonstrates how to use FreshDocs ann
 
 ## API Reference
 
-<!--- fresh:file core:cmd/*.go -->
+<!--- fresh:file core:cmd/*.go f275337 -->
 The following section documents the main API functions:
 
-<!--- fresh:file core:cmd/update.go 345f884 -->
+<!--- fresh:file core:cmd/update.go c8ba97d -->
 The `update` command allows you to update document hashes.
 
-<!--- fresh:file core:cmd/validate.go cc2fe6e -->
+<!--- fresh:file core:cmd/validate.go f275337 -->
 The `validate` command checks which documents are affected by code changes.
 
 ## Configuration
 
-<!--- fresh:file core:config/config.go a5f6a81 -->
+<!--- fresh:file core:config/config.go c8ba97d -->
 The configuration system supports multiple repositories and document groups.
 
 ## Usage Examples
