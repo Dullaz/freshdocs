@@ -86,12 +86,6 @@ homebrew_casks:
 
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
 
-      token_type: "github"
-
     commit_author:
       name: goreleaserbot
-
-      # Git author email.
-      #
-      # Templates: allowed.
       email: dev@dullaz.com
