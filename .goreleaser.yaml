@@ -77,6 +77,13 @@ homebrew_casks:
 
     description: "CLI tool to keep your documentation up to date with your code."
 
+    hooks:
+      post:
+        install: |
+          if system_command("/usr/bin/xattr", args: ["-h"]).exit_status == 0
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/freshdocs.app"]
+          end
+          
     repository:
       owner: dullaz
 
