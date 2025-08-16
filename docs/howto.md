@@ -1,4 +1,4 @@
 # How to contribute
-<!--- fresh:file core:cmd/*.go 9c8e95d -->
+<!--- fresh:file core:cmd/*.go 32fa99d -->
 do this
 do that
