@@ -19,7 +19,7 @@ var checkCmd = &cobra.Command{
 	Short: "Checks if any annotations are affected by staged/unstaged changes",
 	Long: `Checks if any annotations are affected by staged/unstaged changes.
 This includes annotations that are now invalid as a result of staged/unstaged changes.
-cool
+
 `,
 	Run: func(cmd *cobra.Command, args []string) {
 		config, err := config.LoadConfig()
