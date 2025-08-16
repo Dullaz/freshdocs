@@ -56,3 +56,42 @@ release:
     ---
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
+
+homebrew_casks:
+  -
+    url:
+      template: "https://github.com/dullaz/freshdocs/releases/download/{{ .Tag }}/{{ .ArtifactName }}"
+      using: ":homebrew_curl"
+      cookies:
+        license: "accept-backup"
+
+      referer: "https://github.com/Dullaz/homebrew-freshdocs"
+      headers:
+        - "X-Version: {{ .Version }}"
+
+    commit_msg_template: "Brew cask update for {{ .ProjectName }} version {{ .Tag }}"
+
+    directory: Casks
+
+    homepage: "https://github.com/Dullaz/freshdocs"
+
+    description: "CLI tool to keep your documentation up to date with your code."
+
+    repository:
+      owner: dullaz
+
+      name: homebrew-freshdocs
+
+      branch: main
+
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+
+      token_type: "github"
+
+    commit_author:
+      name: goreleaserbot
+
+      # Git author email.
+      #
+      # Templates: allowed.
+      email: dev@dullaz.com
