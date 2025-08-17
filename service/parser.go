@@ -3,6 +3,7 @@ package service
 import (
 	"os"
 	"path/filepath"
+	"slices"
 	"strings"
 
 	"github.com/dullaz/freshdocs/config"
@@ -10,11 +11,16 @@ import (
 )
 
 type Parser struct {
-	config *config.FreshConfig
+	config       *config.FreshConfig
+	onlyDocument string
 }
 
 func NewParser(config *config.FreshConfig) *Parser {
 	return &Parser{config: config}
+}
+
+func (p *Parser) SetOnlyDocument(onlyDocument string) {
+	p.onlyDocument = onlyDocument
 }
 
 func (p *Parser) Parse() ([]*model.Document, error) {
@@ -35,6 +41,22 @@ func (p *Parser) Parse() ([]*model.Document, error) {
 func (p *Parser) parseDocumentGroup(documentGroup config.DocumentGroup) ([]*model.Document, error) {
 	var documents []*model.Document
 
+	var filepathFilter []string
+
+	if p.onlyDocument != "" {
+		matches, err := filepath.Glob(p.onlyDocument)
+		if err != nil {
+			return nil, err
+		}
+		for _, match := range matches {
+			absPath, err := filepath.Abs(match)
+			if err != nil {
+				return nil, err
+			}
+			filepathFilter = append(filepathFilter, absPath)
+		}
+	}
+
 	err := filepath.Walk(documentGroup.Path, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -46,6 +68,16 @@ func (p *Parser) parseDocumentGroup(documentGroup config.DocumentGroup) ([]*mode
 
 		if !strings.HasSuffix(path, documentGroup.Ext) {
 			return nil
+		}
+
+		if p.onlyDocument != "" {
+			absDocument, err := filepath.Abs(path)
+			if err != nil {
+				return err
+			}
+			if !slices.Contains(filepathFilter, absDocument) {
+				return nil
+			}
 		}
 
 		doc, err := p.parseDocument(path)

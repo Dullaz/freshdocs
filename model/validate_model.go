@@ -16,8 +16,8 @@ type StaleResult struct {
 }
 
 func (sr *StaleResult) String() string {
-	return fmt.Sprintf("%s:%s:%d is stale! %s -> %s",
-		sr.Repo, sr.DocumentPath, sr.Line, sr.DocumentHash, sr.LatestHash)
+	return fmt.Sprintf("%s:%s:%d annotation is stale",
+		sr.Repo, sr.DocumentPath, sr.Line)
 }
 
 type FileMissingResult struct {
@@ -26,8 +26,8 @@ type FileMissingResult struct {
 }
 
 func (fmr *FileMissingResult) String() string {
-	return fmt.Sprintf("%s:%s:%d is missing! last seen hash: %s",
-		fmr.Repo, fmr.DocumentPath, fmr.Line, fmr.LastSeenHash)
+	return fmt.Sprintf("%s:%s:%d target file not found",
+		fmr.Repo, fmr.DocumentPath, fmr.Line)
 }
 
 type InvalidResult struct {
@@ -36,7 +36,7 @@ type InvalidResult struct {
 }
 
 func (ir *InvalidResult) String() string {
-	return fmt.Sprintf("%s:%s:%d is invalid! %s",
+	return fmt.Sprintf("%s:%s:%d invalid: %s",
 		ir.Repo, ir.DocumentPath, ir.Line, ir.Message)
 }
 

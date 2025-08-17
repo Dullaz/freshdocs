@@ -21,12 +21,19 @@ var validateCmd = &cobra.Command{
 	have no hash, are stale, or point to files that do not exist anymore.
 `,
 	Run: func(cmd *cobra.Command, args []string) {
+		onlyDocument := ""
+		if len(args) > 0 {
+			onlyDocument = args[0]
+		}
+
 		config, err := config.LoadConfig()
 		if err != nil {
 			log.Fatalf("failed to load config: %v", err)
 		}
 
 		parser := service.NewParser(config)
+		parser.SetOnlyDocument(onlyDocument)
+
 		documents, err := parser.Parse()
 		if err != nil {
 			log.Fatalf("failed to parse documents: %v", err)
@@ -57,13 +64,4 @@ var validateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(validateCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// validateCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// validateCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

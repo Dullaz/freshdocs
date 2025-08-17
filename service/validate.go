@@ -19,7 +19,7 @@ func (v *Validator) Validate(document *model.Document) (*model.ValidateResults, 
 
 	for _, annotation := range document.Annotations {
 		latestHash, err := util.GetGitHash(v.config.Repositories[annotation.Repo].Path, annotation.RepoFilePath)
-		if err != nil {
+		if err != nil || latestHash == "" {
 			results.AddFileMissingResult(document, annotation)
 			continue
 		}
