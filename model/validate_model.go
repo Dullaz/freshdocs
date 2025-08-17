@@ -16,8 +16,8 @@ type StaleResult struct {
 }
 
 func (sr *StaleResult) String() string {
-	return fmt.Sprintf("%s:%s:%d annotation is stale",
-		sr.Repo, sr.DocumentPath, sr.Line)
+	return fmt.Sprintf("%s:%d annotation is stale",
+		sr.DocumentPath, sr.Line)
 }
 
 type FileMissingResult struct {
@@ -26,8 +26,8 @@ type FileMissingResult struct {
 }
 
 func (fmr *FileMissingResult) String() string {
-	return fmt.Sprintf("%s:%s:%d target file not found",
-		fmr.Repo, fmr.DocumentPath, fmr.Line)
+	return fmt.Sprintf("%s:%d target file not found",
+		fmr.DocumentPath, fmr.Line)
 }
 
 type InvalidResult struct {
@@ -36,8 +36,8 @@ type InvalidResult struct {
 }
 
 func (ir *InvalidResult) String() string {
-	return fmt.Sprintf("%s:%s:%d invalid: %s",
-		ir.Repo, ir.DocumentPath, ir.Line, ir.Message)
+	return fmt.Sprintf("%s:%d invalid: %s",
+		ir.DocumentPath, ir.Line, ir.Message)
 }
 
 type ValidateResults struct {
